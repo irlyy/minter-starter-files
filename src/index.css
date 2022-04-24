@@ -19,7 +19,10 @@ code {
   padding: 60px 100px;
   margin: 0 auto;
   text-align: left;
+}
 
+.Part1 {
+  border:3px solid #000;
 }
 
 input {

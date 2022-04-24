@@ -1,4 +1,5 @@
 import { pinJSONToIPFS } from './pinata.js';
+import { getNeedInstallErrorStatus } from "./error-status";
 
 require('dotenv').config();
 console.log(process.env);
@@ -58,6 +59,44 @@ export const mintNFT = async (url, name, description) => {
     }
 };
 
+export const mintNFT2 = async (url) => {
+    //error handling
+    if (url.trim() == "") {
+        return {
+            success: false,
+            status: "❗Please make sure all fields are completed before minting.",
+        }
+    }
+    const tokenURI = url;
+
+    window.contract = await new web3.eth.Contract(contractABI, contractAddress);
+
+    //set up your Ethereum transaction
+    const transactionParameters = {
+        to: contractAddress, // Required except during contract publications.
+        from: window.ethereum.selectedAddress, // must match user's active address.
+        'data': window.contract.methods.mintNFT(window.ethereum.selectedAddress, tokenURI).encodeABI()//make call to NFT smart contract 
+    };
+
+    //sign the transaction via Metamask
+    try {
+        const txHash = await window.ethereum
+            .request({
+                method: 'eth_sendTransaction',
+                params: [transactionParameters],
+            });
+        return {
+            success: true,
+            status: "✅ Check out your transaction on Etherscan: " + txHash
+        }
+    } catch (error) {
+        return {
+            success: false,
+            status: "😥 Something went wrong: " + error.message
+        }
+    }
+};
+
 export const connectWallet = async () => {
     if (window.ethereum) {
         try {
@@ -76,20 +115,10 @@ export const connectWallet = async () => {
             };
         }
     } else {
+        const { status } = getNeedInstallErrorStatus();
         return {
             address: "",
-            status: (
-                <span>
-                    <p>
-                        {" "}
-                        🦊{" "}
-                        <a target="_blank" href={`https://metamask.io/download.html`}>
-                            You must install Metamask, a virtual Ethereum wallet, in your
-                            browser.
-                        </a>
-                    </p>
-                </span>
-            ),
+            status: status,
         };
     }
 };
@@ -118,20 +147,10 @@ export const getCurrentWalletConnected = async () => {
             };
         }
     } else {
+        const { status } = getNeedInstallErrorStatus();
         return {
             address: "",
-            status: (
-                <span>
-                    <p>
-                        {" "}
-                        🦊{" "}
-                        <a target="_blank" href={`https://metamask.io/download.html`}>
-                            You must install Metamask, a virtual Ethereum wallet, in your
-                            browser.
-                        </a>
-                    </p>
-                </span>
-            ),
+            status: status,
         };
     }
 };
