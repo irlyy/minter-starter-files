@@ -21,6 +21,12 @@ code {
   text-align: left;
 }
 
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
 .Part1 {
   border:3px solid #000;
 }

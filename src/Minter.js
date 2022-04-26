@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { connectWallet, getCurrentWalletConnected, mintNFT, mintNFT2 } from "./utils/interact";
 import { getNeedInstallErrorStatus } from "./utils/error-status";
+import { getCoinPrice } from "./utils/price-watcher";
 
 const Minter = (props) => {
 
@@ -12,13 +13,21 @@ const Minter = (props) => {
   const [url, setURL] = useState("");
   const [status2, setStatus2] = useState("");
   const [url2, setURL2] = useState("");
+  const [ethPrice, setEthPrice] = useState("");
+  const [btcPrice, setBtcPrice] = useState("");
+  const [vaiPrice, setVaiPrice] = useState("");
 
   useEffect(async () => { //TODO: implement
     const { address, status } = await getCurrentWalletConnected();
     setWallet(address);
     setStatus(status);
     setStatus2(status);
-
+    let result = await getCoinPrice('ethereum');
+    setEthPrice(result.price);
+    let result1 = await getCoinPrice('bitcoin');
+    setBtcPrice(result1.price);
+    let result2 = await getCoinPrice('vai');
+    setVaiPrice(result2.price);
     addWalletListener();
   }, []);
 
@@ -69,6 +78,9 @@ const Minter = (props) => {
           <span>Connect Wallet</span>
         )}
       </button>
+      <p id="status">
+          Eth价格:{ethPrice} BTC价格:{btcPrice} VAI价格:{vaiPrice}
+        </p>
 
       <br></br>
       <h1 id="title">🧙‍♂️ 游艇兜风 NFT Minter</h1>
